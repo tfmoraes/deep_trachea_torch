@@ -1,0 +1,13 @@
+h5py
+nibabel
+numpy
+pyparsing
+torch==1.8.1
+typing-extensions
+tensorboard
+scipy
+scikit-image
+cython
+tqdm
+torchviz
+vtk
