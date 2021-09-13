@@ -37,8 +37,10 @@ def gen_image_patches(files, queue, patch_size=SIZE, num_patches=NUM_PATCHES):
     original_image = nb.load(str(image_filename)).get_fdata()
     original_mask = nb.load(str(mask_filename)).get_fdata()
 
-    normalized_image = image_normalize(original_image)
-    normalized_mask = image_normalize(original_mask)
+    print(image_filename, mask_filename)
+
+    normalized_image = image_normalize(original_image).astype(np.float32)
+    normalized_mask = image_normalize(original_mask).astype(np.float32)
 
     patches_files = []
     # Mirroring
@@ -124,11 +126,11 @@ def gen_image_patches(files, queue, patch_size=SIZE, num_patches=NUM_PATCHES):
 
 def gen_all_patches(files):
     m = multiprocessing.Manager()
-    queue = m.Queue(maxsize=10000)
+    queue = m.Queue(maxsize=10)
     total_size = len(files) * NUM_ROTS * MIRRORING * NUM_PATCHES
     train_size  = int(total_size * 0.8)
     test_size = total_size - train_size
-    with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
         f_h5 = executor.submit(h5file_from_patches, train_size, test_size, queue, SIZE)
         futures = []
         for image_file, mask_file in files:

@@ -170,7 +170,7 @@ def train():
     model.to(dev)
 
     image_test = nb.load(
-        "datasets/cc359/Original/CC0016_philips_15_55_M.nii.gz"
+        "datasets/ID00009637202177434476278/image.nii.gz"
     ).get_fdata()
 
     training_files_gen = HDF5Sequence("train_arrays.h5", args.batch_size)
