@@ -42,6 +42,9 @@ def gen_image_patches(files, queue, patch_size=SIZE, num_patches=NUM_PATCHES):
     normalized_image = image_normalize(original_image).astype(np.float32)
     normalized_mask = image_normalize(original_mask).astype(np.float32)
 
+    del original_image
+    del original_mask
+
     patches_files = []
     # Mirroring
     for m in range(MIRRORING):

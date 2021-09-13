@@ -42,12 +42,7 @@ parser.add_argument(
     dest="continue_train",
 )
 parser.add_argument(
-    "-b",
-    "--batch-size",
-    default=26,
-    type=int,
-    metavar="N",
-    help="Batch size"
+    "-b", "--batch-size", default=26, type=int, metavar="N", help="Batch size"
 )
 parser.add_argument(
     "--lr",
@@ -169,14 +164,18 @@ def train():
         model = nn.DataParallel(model)
     model.to(dev)
 
-    image_test = nb.load(
-        "datasets/ID00009637202177434476278/image.nii.gz"
-    ).get_fdata()
+    image_test = nb.load("datasets/ID00009637202177434476278/image.nii.gz").get_fdata()
+    mask_test = nb.load("datasets/ID00009637202177434476278/mask.nii.gz").get_fdata()
+
+    writer.add_image("Groundtruth View 1", np.expand_dims(mask_test.max(0), 0), 0)
+    writer.add_image("Groundtruth View 2", np.expand_dims(mask_test.max(1), 0), 0)
+    writer.add_image("Groundtruth View 3", np.expand_dims(mask_test.max(2), 0), 0)
 
     training_files_gen = HDF5Sequence("train_arrays.h5", args.batch_size)
     testing_files_gen = HDF5Sequence("test_arrays.h5", args.batch_size)
-    # mean = training_files_gen.mean
-    # std = training_files_gen.std
+    mean = training_files_gen.mean
+    std = training_files_gen.std
+    print(f"mean={mean}, std={std}")
     mean = 0.0
     std = 1.0
     prop_bg, prop_fg = training_files_gen.calc_proportions()
@@ -188,9 +187,9 @@ def train():
         f"{len(training_files_gen)}, {training_files_gen.x.shape[0]}, {args.batch_size}"
     )
 
-    criterion = DiceLoss(apply_sigmoid=False)
+    # criterion = DiceLoss(apply_sigmoid=False)
     # criterion = nn.BCELoss()
-    # criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pos_weight]).to(dev))
+    criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([pos_weight]).to(dev))
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
     if args.continue_train:
         epoch, model, optimizer, best_loss = load_checkpoint(model, optimizer)
@@ -270,7 +269,11 @@ def train():
             is_best=actual_loss == best_loss,
         )
 
-        if epoch >= args.patience and args.early_stop > 0 and epochs_no_improve == args.early_stop:
+        if (
+            epoch >= args.patience
+            and args.early_stop > 0
+            and epochs_no_improve == args.early_stop
+        ):
             print("Early-top!")
             break
 
