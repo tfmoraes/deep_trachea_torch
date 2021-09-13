@@ -1,56 +1,25 @@
-import sys
 import pathlib
+import sys
+import typing
 
-def get_cc359_filenames(base_folder):
-    original_folder = base_folder.joinpath("cc359/Original")
-    mask_folder = base_folder.joinpath("cc359/Silver-standard")
+
+def get_trachea_files(
+    base_folder: pathlib.Path,
+) -> typing.List[typing.Tuple[pathlib.Path, pathlib.Path]]:
     files = []
-    for original_filename in list(original_folder.glob("*.nii.gz")):
-        mask_filename = mask_folder.joinpath(
-            "{}_ss.nii.gz".format(original_filename.stem.split(".")[0])
-        )
-        files.append((original_filename, mask_filename))
-    return files
-
-
-def get_nfbs_filenames(base_folder):
-    nfbs_folder = base_folder.joinpath("nfbs/NFBS_Dataset")
-    files = []
-    for original_filename in list(nfbs_folder.glob("**/*_T1w.nii.gz")):
-        mask_filename = original_filename.parent.joinpath(
-            "{}_brainmask.nii.gz".format(original_filename.stem.split(".")[0])
-        )
-        assert mask_filename.exists()
-        files.append((original_filename, mask_filename))
-    return files
-
-
-def get_lidc_filenames(base_folder):
-    """
-    lung nodules dataset
-    """
-    
-    lidc_folder = base_folder.joinpath("LIDC-IDRI")
-
-    files = []
-
-    for folder_name in list(lidc_folder.glob("*")):
-        
-        volume, mask = (folder_name.joinpath("ct.nii.gz"),\
-                folder_name.joinpath("mask.nii.gz"))
-
-        files.append((volume, mask))
-
+    for nii_folder in base_folder.iterdir():
+        image_filename = nii_folder.joinpath("image.nii.gz")
+        mask_filename = nii_folder.joinpath("mask.nii.gz")
+        if image_filename.exists() and mask_filename.exists():
+            files.append((image_filename, mask_filename))
     return files
 
 
 def main():
     base_folder = pathlib.Path(sys.argv[1]).resolve()
-    cc359_files = get_cc359_filenames(base_folder)
-    nfbs_files = get_nfbs_filenames(base_folder)
+    trachea_files = get_trachea_files(base_folder)
+    print(len(trachea_files))
 
-    print(len(cc359_files))
-    print(len(nfbs_files))
 
 if __name__ == "__main__":
     main()

@@ -45,7 +45,7 @@
       in
       {
         devShell = pkgs.mkShell {
-          name = "manolo_deepbrain_torch";
+          name = "manolo_deeptrachea_torch";
           buildInputs = with pkgs; [
             my_python
           ] ++ gpu_libs;

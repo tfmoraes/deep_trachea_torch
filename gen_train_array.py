@@ -193,15 +193,13 @@ def h5file_from_patches(train_size, test_size, queue, patch_size=SIZE):
 
 
 def main():
-    deepbrain_folder = pathlib.Path("datasets").resolve()
-    # deepbrain_folder = pathlib.Path("datasets").resolve()
-    # files = file_utils.get_lidc_filenames(deepbrain_folder)
+    deeptrache_folder = pathlib.Path("datasets").resolve()
+    # deeptrache_folder = pathlib.Path("datasets").resolve()
+    # files = file_utils.get_lidc_filenames(deeptrache_folder)
 
-    cc359_files = file_utils.get_cc359_filenames(deepbrain_folder)
-    nfbs_files = file_utils.get_nfbs_filenames(deepbrain_folder)
-    files = cc359_files + nfbs_files
+    trachea_files = file_utils.get_trachea_files(deeptrache_folder)
 
-    patches_files = gen_all_patches(files)
+    patches_files = gen_all_patches(trachea_files)
     # random.shuffle(patches_files)
 
     # training_files = patches_files[: int(len(patches_files) * 0.80)]

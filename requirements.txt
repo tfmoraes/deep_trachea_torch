@@ -11,3 +11,4 @@ cython
 tqdm
 torchviz
 vtk
+pynrrd
